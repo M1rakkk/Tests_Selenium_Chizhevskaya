@@ -20,7 +20,7 @@ public class Tests
     private const string NewsUrl = "https://staff-testing.testkontur.ru/news";
     private const string CommunitiesUrl = "https://staff-testing.testkontur.ru/communities";
 
-    //данные для авторизации (скрыты)
+    //данные для авторизации (скрыть)
     private const string Login = "mila.milka11@bk.ru";
     private const string Password = "heBdah-viwcup-rovri0";
 
@@ -60,13 +60,11 @@ public class Tests
     // открываем боковое меню
         var sidebarButton = wait.Until(ExpectedConditions.ElementToBeClickable(
         By.CssSelector("[data-tid='SidebarMenuButton']")));
-        wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[data-tid='SidePage__root']")));
 
         sidebarButton.Click();
+        wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[data-tid='SidePage__root']")));
 
-    // ждём появления панели меню
-        wait.Until(ExpectedConditions.ElementIsVisible(
-        By.CssSelector("[data-tid='SidePage__root']")));
+
     }
 
     [Test]
