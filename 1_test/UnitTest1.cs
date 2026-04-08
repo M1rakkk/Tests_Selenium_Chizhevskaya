@@ -10,6 +10,7 @@ namespace five_tests_selenium;
 //5. Человекочитаемые названия тестов — проверяющий понимает, что именно тестируется
 //6. Уникальные локаторы — используются там, где это возможно
 //7. Явные или неявные ожидания — тесты не падают из-за гонки с интерфейсом   
+
 public class Tests
 {
     public WebDriver driver;
@@ -46,13 +47,13 @@ public class Tests
         driver.Navigate().GoToUrl(BaseUrl);
         //ввод логина
         driver.FindElement(By.Id("Username")).SendKeys(Login);
-        //вести пароль
+        //ввод пароля
         driver.FindElement(By.Id("Password")).SendKeys(Password);
         //нажать кнопку войти
         var enter = driver.FindElement(By.Name("button"));
         enter.Click();
-        // ждем переход
-        wait.Until(ExpectedConditions.UrlToBe(NewsUrl)); //явное ожидание
+        // явное ожидание
+        wait.Until(ExpectedConditions.UrlToBe(NewsUrl)); 
 
     }
     private void OpenSidebar()
@@ -62,6 +63,7 @@ public class Tests
         By.CssSelector("[data-tid='SidebarMenuButton']")));
 
         sidebarButton.Click();
+        //явное ожидание
         wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[data-tid='SidePage__root']")));
 
 
@@ -105,7 +107,6 @@ public class Tests
       
     }
     [Test]
-    //выход
     public void LogoutProfile()
     {
         Authorize(); 
@@ -155,4 +156,39 @@ public class Tests
         $"Ожидался комментарий '{expectedCommentText}', " +
         $"но появился: '{newComment.Text}'");
 }
+    //доп тест
+    [Test]
+    public void CreateNewCommunity()
+    {
+        Authorize();
+        driver.Navigate().GoToUrl(CommunitiesUrl);
+
+        string communityName = $"Тест сообщество {DateTime.Now:HH:mm:ss}";
+
+        // нажимаем кнопку создать 
+        var createButton = wait.Until(ExpectedConditions.ElementToBeClickable(
+        By.XPath("//section[@data-tid='PageHeader']//button[contains(., 'СОЗДАТЬ')]")));
+        createButton.Click();
+
+        //  пишем название
+        var nameInput = wait.Until(ExpectedConditions.ElementIsVisible(
+        By.CssSelector("textarea[placeholder='Название сообщества']")));
+        nameInput.SendKeys(communityName);
+
+        //  нажимаем "Создать" в модальном окне
+        var confirmButton = wait.Until(ExpectedConditions.ElementToBeClickable(
+        By.CssSelector("[data-tid='CreateButton'] button")));
+        confirmButton.Click();
+
+        // переходим на вкладку "Я модератор", чтобы проверить созданно ли сообщество
+        driver.Navigate().GoToUrl(CommunitiesUrl + "?activeTab=isAdministrator");
+
+        // проверяем наличие созданного сообщества
+        var communityLink = wait.Until(ExpectedConditions.ElementIsVisible(
+        By.XPath($"//a[contains(text(), '{communityName}')]")));
+
+        Assert.That(communityLink.Displayed, Is.True,
+        $"Созданное сообщество '{communityName}' должно появиться в списке 'Я модератор'");
+    }
 }
+//p.s. я знаю, что у меня проблема с локаторами, не могу в некоторых местах найти уникальные data-tid.
